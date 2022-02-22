@@ -1,7 +1,10 @@
 #include <FastLED.h>
+#include <SoftwareSerial.h>
+
 #define NUM_LEDS 119
 
 CRGB leds[NUM_LEDS];
+SoftwareSerial s(5, 6); // RX, TX
 
 uint8_t paletteIndex = 0;
 int whichPalette = 0;
@@ -10,8 +13,8 @@ uint8_t hue = 0;
 long change_delay = 60000;
 long pre = 0;
 
-int value;
-int pre_value = 0;
+char value;
+char pre_value = '0';
 
 //  Basic
 
@@ -85,6 +88,8 @@ CRGBPalette16 witching_hour(Witching_Hour_gp);
 
 void off_lights()
 {
+  FastLED.setBrightness(0);
+
   for (int i = 0; i < NUM_LEDS; i++)
   {
     leds[i] = CRGB(0, 0, 0);
@@ -255,43 +260,54 @@ void alarm_lights()
 
 void setup()
 {
-  FastLED.addLeds<WS2812, 3, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812, 10, GRB>(leds, NUM_LEDS);
+
+  for (int i = 0; i < NUM_LEDS; i++)
+  {
+    leds[i] = CRGB(255, 255, 255);
+  }
+
+  FastLED.show();
+
+  delay(2000);
 
   Serial.begin(9600);
+  s.begin(9600);
 }
 
 void loop()
 {
-  if (Serial.available())
+  if (s.available())
   {
-    int v = Serial.read();
+    char v = s.read();
     if (v != pre_value)
     {
       value = v;
+      Serial.println(value);
     }
   }
 
-  if (value == 1)
+  if (value == '1')
   {
     normal_lights();
   }
 
-  else if (value == 2)
+  else if (value == '2')
   {
     gaming_lights();
   }
 
-  else if (value == 3)
+  else if (value == '3')
   {
     music_lights();
   }
 
-  else if (value == 4)
+  else if (value == '4')
   {
     study_lights();
   }
 
-  else if (value == 5)
+  else if (value == '5')
   {
     FastLED.setBrightness(255);
 
@@ -303,7 +319,7 @@ void loop()
     FastLED.show();
   }
 
-  else if (value == 6)
+  else if (value == '6')
   {
     FastLED.setBrightness(255);
 
@@ -315,17 +331,17 @@ void loop()
     FastLED.show();
   }
 
-  else if (value == 7)
+  else if (value == '7')
   {
     alarm_lights();
   }
 
-  else if (value == 8)
+  else if (value == '8')
   {
     night_lights();
   }
 
-  else
+  else if (value == '9')
   {
     off_lights();
   }

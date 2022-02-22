@@ -26,6 +26,9 @@
 #include <ESP8266WebServer.h>
 #include <Arduino_JSON.h>
 #include <SoftwareSerial.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
 #include <RTClib.h>
 #include <CuteBuzzerSounds.h>
 #include <Adafruit_GFX.h>
@@ -56,27 +59,30 @@
 //  Declareations - API / Wifi
 
 const char *ssid = "SSID";
-const char *password = "PASSWORD";
+const char *password = "Pass";
 
 String openWeatherMapApiKey = "API_KEY";
 
-String city = "YOUR_CITY";
-String countryCode = "LK";
+String city = "Your_city";
+String countryCode = "LK"; // Your Contry Code
 
-char clientId[] = "SPOTIFY_CLIENT_ID";            // Your client ID of your spotify APP
-char clientSecret[] = "SPOTIFY_CLIENT_SECRET_ID"; // Your client Secret of your spotify APP (Do Not share this!)
+char clientId[] = "CLIENT_ID";      // Your client ID of your spotify APP
+char clientSecret[] = "CLIENT_SID"; // Your client Secret of your spotify APP (Do Not share this!)
+
+String pre_track = "";
 
 #define SPOTIFY_MARKET "LK"
 
-#define SPOTIFY_REFRESH_TOKEN "SPOTIFY_REFRESH_TOKEN"
-
-String pre_track = "";
+#define SPOTIFY_REFRESH_TOKEN "REFRESH_TOKEN"
 
 WiFiClientSecure client;
 ESP8266WebServer server(80);
 SpotifyArduino spotify(client, clientId, clientSecret, SPOTIFY_REFRESH_TOKEN);
 
 String jsonBuffer;
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org");
 
 //  Objects
 
@@ -124,6 +130,125 @@ String httpGETRequest(const char *serverName)
   http.end();
 
   return payload;
+}
+
+//  Variables - Unix
+
+int hours_final, minutes_final, seconds_final, year_final, month_final, day_final;
+
+String unix_time_to_date_converted(long int seconds)
+{
+
+  String ans = "";
+
+  int daysOfmonth_converted[] = {31, 28, 31, 30, 31, 30,
+                                 31, 31, 30, 31, 30, 31};
+
+  long int currYear, daysTillNow, extraTime,
+      extraDays, index, date_converted, month_converted, hours_converted,
+      minutes_converted, seconds_converted, flag = 0;
+
+  daysTillNow = seconds / (24 * 60 * 60);
+  extraTime = seconds % (24 * 60 * 60);
+  currYear = 1970;
+
+  while (daysTillNow >= 365)
+  {
+    if (currYear % 400 == 0 || (currYear % 4 == 0 && currYear % 100 != 0))
+    {
+      daysTillNow -= 366;
+    }
+    else
+    {
+      daysTillNow -= 365;
+    }
+    currYear += 1;
+  }
+
+  extraDays = daysTillNow + 1;
+
+  if (currYear % 400 == 0 || (currYear % 4 == 0 && currYear % 100 != 0))
+    flag = 1;
+
+  month_converted = 0, index = 0;
+  if (flag == 1)
+  {
+    while (true)
+    {
+
+      if (index == 1)
+      {
+        if (extraDays - 29 < 0)
+          break;
+        month_converted += 1;
+        extraDays -= 29;
+      }
+      else
+      {
+        if (extraDays - daysOfmonth_converted[index] < 0)
+        {
+          break;
+        }
+        month_converted += 1;
+        extraDays -= daysOfmonth_converted[index];
+      }
+      index += 1;
+    }
+  }
+  else
+  {
+    while (true)
+    {
+
+      if (extraDays - daysOfmonth_converted[index] < 0)
+      {
+        break;
+      }
+      month_converted += 1;
+      extraDays -= daysOfmonth_converted[index];
+      index += 1;
+    }
+  }
+
+  if (extraDays > 0)
+  {
+    month_converted += 1;
+    date_converted = extraDays;
+  }
+  else
+  {
+    if (month_converted == 2 && flag == 1)
+      date_converted = 29;
+    else
+    {
+      date_converted = daysOfmonth_converted[month_converted - 1];
+    }
+  }
+
+  hours_converted = extraTime / 3600;
+  minutes_converted = (extraTime % 3600) / 60;
+  seconds_converted = (extraTime % 3600) % 60;
+
+  ans += (String)date_converted;
+  ans += "/";
+  ans += (String)month_converted;
+  ans += "/";
+  ans += (String)currYear;
+  ans += " ";
+  ans += (String)hours_converted;
+  ans += ":";
+  ans += (String)minutes_converted;
+  ans += ":";
+  ans += (String)seconds_converted;
+
+  hours_final = hours_converted;
+  minutes_final = minutes_converted;
+  seconds_final = seconds_converted;
+  year_final = currYear;
+  month_final = month_converted;
+  day_final = date_converted;
+
+  return ans;
 }
 
 //  Variables - Timer
@@ -1250,23 +1375,23 @@ void random_function()
   {
     if (mode_of_lights == 0)
     {
-      s.write(1);
+      s.write('1');
     }
 
     else if (mode_of_lights == 1)
     {
-      s.write(2);
+      s.write('2');
     }
 
     else if (mode_of_lights == 2)
     {
-      s.write(4);
+      s.write('4');
     }
   }
 
   else
   {
-    s.write(0);
+    s.write('9');
   }
 
   normal_eyes();
@@ -1296,6 +1421,22 @@ void random_function()
     side_timer_delay = random(30000, 60000);
     side_last_time = millis();
   }
+}
+
+void update_rtc()
+{
+  Serial.println("Updating Time on RTC from Server");
+
+  timeClient.update();
+
+  unsigned long epochTime = timeClient.getEpochTime();
+  Serial.print("Epoch Time: ");
+  Serial.println(epochTime);
+
+  Serial.println(unix_time_to_date_converted(epochTime));
+
+  rtc.adjust(DateTime(year_final, month_final, day_final, hours_final, minutes_final, seconds_final));
+  Serial.println(String(year_final) + ", " + String(month_final) + ", " + String(day_final) + ", " + String(hours_final) + ", " + String(minutes_final) + ", " + String(seconds_final));
 }
 
 void check_for_alarms()
@@ -1476,7 +1617,14 @@ void basic_function()
   {
     if (is_night == true && is_night_func_goon == true)
     {
-      s.write(8);
+      if (lights == true)
+      {
+        s.write('8');
+      }
+      else
+      {
+        s.write('9');
+      }
       clock_face();
 
       if ((millis() - sleep_last_time) >= sleep_timer_delay)
@@ -1498,7 +1646,7 @@ void basic_function()
 
 void alarm_function(String alarm_des)
 {
-  s.write(7);
+  s.write('7');
 
   display.clearDisplay();
   display.drawBitmap(39, 0, alarm_ico, 50, 50, WHITE);
@@ -1562,7 +1710,9 @@ void setup()
   //  Serial
   Serial.begin(115200);
   s.begin(9600);
-  s.write(0);
+  delay(500);
+
+  s.write('9');
 
   Serial.println("  ________            ______ ________      _____");
   Serial.println("  ___  __ \______________  /____  __ )_______  /_");
@@ -1609,7 +1759,7 @@ void setup()
   {
     if (tried_times > 25)
     {
-      s.write(6);
+      s.write('6');
       digitalWrite(RED_LED, HIGH);
       digitalWrite(GREEN_LED, LOW);
 
@@ -1635,7 +1785,7 @@ void setup()
 
   if (WiFi.status() == WL_CONNECTED)
   {
-    s.write(5);
+    s.write('5');
     Serial.println("");
     Serial.print("Connected to WiFi network with IP Address: ");
     Serial.println(WiFi.localIP());
@@ -1659,14 +1809,14 @@ void setup()
     display.display();
 
     delay(2000);
-  }
 
-  client.setFingerprint(SPOTIFY_FINGERPRINT); // These expire every few months
+    client.setFingerprint(SPOTIFY_FINGERPRINT); // These expire every few months
 
-  Serial.println("Refreshing Access Tokens");
-  if (!spotify.refreshAccessToken())
-  {
-    Serial.println("Failed to get access tokens");
+    Serial.println("Refreshing Access Tokens");
+    if (!spotify.refreshAccessToken())
+    {
+      Serial.println("Failed to get access tokens");
+    }
   }
 
 #ifndef ESP8266
@@ -1684,6 +1834,13 @@ void setup()
     Serial.println("Couldn't find RTC");
 
     cute.play(S_CONFUSED);
+  }
+  else if (WiFi.status() == WL_CONNECTED)
+  {
+    timeClient.begin();
+    timeClient.setTimeOffset(19800); // Change according to Time Zone (GMT 0 = 0, GMT +1 = 3600, GMT +2 = 7200, GMT -1 = -3600 likewise)
+
+    update_rtc();
   }
 
   server.on("/", handle_OnConnect);
@@ -1727,8 +1884,7 @@ void handle_lightsoff()
 {
   lights = false;
   mode_of_lights = 10;
-  s.write(0);
-  s.write(9);
+  s.write('9');
 
   server.send(200, "text/html", SendHTML(lights, mode_of_lights));
 }
@@ -1765,12 +1921,20 @@ void handle_touch()
 
 void handle_reset()
 {
-  ESP.restart();
-
   lights = false;
   mode_of_lights = 10;
-
   server.send(200, "text/html", SendHTML(lights, mode_of_lights));
+
+  display.setFont();
+
+  sleepy_eyes();
+  display.setCursor(0, 55);
+  display.print("Resetting...");
+  display.display();
+
+  delay(2000);
+
+  ESP.restart();
 }
 
 void handle_NotFound()
@@ -1891,7 +2055,16 @@ void loop()
 
   if (status == 200)
   {
-    s.write(3);
+    if (lights == true)
+    {
+      s.write('3');
+    }
+
+    else
+    {
+      s.write('9');
+    }
+
     display.clearDisplay();
     display.setTextSize(1);
     display.setFont();

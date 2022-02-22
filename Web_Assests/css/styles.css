@@ -1,0 +1,137 @@
+body {
+  background-color: #e2e2e2;
+  background-image: linear-gradient(90deg, #c9d6ff 0%, #e2e2e2 150%);
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: rgb(88, 88, 88);
+}
+
+h1,
+p {
+  margin: 5%;
+  font-weight: 600;
+}
+
+input {
+  display: block;
+}
+
+p {
+  color: #686868;
+  font-weight: 200;
+}
+
+.pre-ip-p {
+  font-weight: 400;
+}
+
+.deskbot-image {
+  width: 80%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  filter: contrast(70%);
+  z-index: -1;
+}
+
+.container {
+  background-color: #fff;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 350px;
+  padding: 20px;
+  border-radius: 20px;
+
+  position: relative;
+  margin: auto;
+}
+
+.dot {
+  width: 320px;
+  position: relative;
+  margin: auto;
+  text-align: center;
+  color: #686868;
+}
+
+input,
+.btn {
+  padding: 10px;
+  border-radius: 10px;
+  width: 300px;
+  font-size: 1.2rem;
+  border: none;
+  margin: 20px 0;
+  box-shadow: 0 0 10px rgb(184, 183, 183);
+}
+
+.ip-input {
+  background-color: #fff;
+  color: #686868;
+}
+
+.btn {
+  background-color: #6788f3;
+  color: #fff;
+  width: 320px;
+}
+
+.btn:hover {
+  background-color: #4f73e9;
+}
+
+.submit-btn {
+  margin-top: 40px;
+}
+
+.foot {
+  color: #686868;
+  position: absolute;
+  bottom: 0;
+  width: 95%;
+  text-align: center;
+}
+
+@media screen and (min-width: 850px) {
+  body {
+    text-align: center;
+  }
+
+  .deskbot-image {
+    width: auto;
+    height: 40%;
+  }
+
+  h1,
+  p {
+    margin: 2% 0;
+  }
+
+  input {
+    display: inline-block;
+  }
+
+  .container {
+    width: 750px;
+    margin-top: 5%;
+  }
+
+  .ip-input {
+    margin: 0 20px;
+  }
+
+  #go-to-pre-ip {
+    margin-bottom: 40px;
+  }
+}

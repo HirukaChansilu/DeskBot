@@ -12,6 +12,7 @@ A Little Robot With Lot's of Potential...
 - Alarms
 - Sync to Spotify Music and Play / Pause
 - Control Basic LED Strip Patterns from The Web Server
+- Automatic Time Setting on Startup
 
 <hr />
 
@@ -64,12 +65,24 @@ Minimum Amps Needed at full Power Usage = NUM_OF_LEDS * 60
 
 <br>
 
-## Libraries Used🔧
+## Libraries and Features Used🔧
 
 - [Spotify API Arduino](https://github.com/witnessmenow/spotify-api-arduino)
 
 - [Cute Buzzer Sounds](https://github.com/GypsyRobot/CuteBuzzerSounds)
 
 - [FastLED](https://github.com/FastLED/FastLED)
+
+- [NTP Client](https://github.com/arduino-libraries/NTPClient)
+
+- [Open Weather Map](https://openweathermap.org/)
+
+<hr />
+
+<br>
+
+## If You Want to Setup This,
+
+> Please refer the Libraries Mentioned Above and Change the variables According to them.
 
 <img src="./Assests/Deskbot_image.png" align="right" width="80%">
