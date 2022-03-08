@@ -4,13 +4,6 @@
 //  _  /_/ //  __/(__  )_  ,<  _  /_/ // /_/ / /_
 //  /_____/ \___//____/ /_/|_| /_____/ \____/\__/    by Hiruka Chansilu
 
-//  OLED Graphics
-
-//  display.fillRect(StartX, StartY, Width in Pixels, Height in Pixels, WHITE);
-//  display.fillCircle(CenterX, CenterY, Radius in Pixels, WHITE);
-//  display.drawLine(StartX, StartY, EndX, EndY, WHITE);
-//  display.drawBitmap(StartX, StartY, Image_Array, Height in pixels, Width in pixels, WHITE);
-
 //  NodeMCU I2C Pins
 
 //  SDA --> D2
@@ -43,7 +36,77 @@
 
 #include <ArduinoJson.h>
 
+//  Alarms
+
+int alarm1[2] = {4, 15};          //  Alarm {hour, minute}
+bool alarm1_on = false;           //  Alarm Easy Toggle
+String alarm1_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
+int alarm1_duration = 5;          //  Alarm Duration in Minutes
+
+int alarm2[2] = {4, 30};          //  Alarm {hour, minute}
+bool alarm2_on = false;           //  Alarm Easy Toggle
+String alarm2_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
+int alarm2_duration = 10;         //  Alarm Duration in Minutes
+
+int alarm3[2] = {4, 45};          //  Alarm {hour, minute}
+bool alarm3_on = false;           //  Alarm Easy Toggle
+String alarm3_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
+int alarm3_duration = 10;         //  Alarm Duration in Minutes
+
+int alarm4[2] = {5, 0};           //  Alarm {hour, minute}
+bool alarm4_on = false;           //  Alarm Easy Toggle
+String alarm4_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
+int alarm4_duration = 10;         //  Alarm Duration in Minutes
+
+int alarm5[2] = {5, 15};          //  Alarm {hour, minute}
+bool alarm5_on = false;           //  Alarm Easy Toggle
+String alarm5_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
+int alarm5_duration = 10;         //  Alarm Duration in Minutes
+
 //  Declareations
+
+const char *ssid = "WIFI_SSID";
+const char *password = "WIFI_PASSWORD";
+
+String openWeatherMapApiKey = "APIKEY_FROM_OPENWEATHERMAP";
+
+String city = "YOUR_CITY_YO_GET_WEATHER_INFO";
+String countryCode = "YOUR_COUNTRY_CODE"; // Ex- LK, US, UK
+
+char clientId[] = "CLIENT_ID";         // Your client ID of your spotify APP
+char clientSecret[] = "CLIENT_SECRET"; // Your client Secret of your spotify APP (Do Not share this!)
+
+#define SPOTIFY_MARKET "YOUR_COUNTRY_CODE" // Ex- LK, US, UK
+
+#define SPOTIFY_REFRESH_TOKEN "REFRESH_TOKEN_FROM_LIBRARY"
+
+int time_offset = 19800; // Change according to Time Zone (GMT 0 = 0, GMT +1 = 3600, GMT +2 = 7200, GMT -1 = -3600 likewise)
+
+//  Variables - Startup LED Strip State
+
+bool lights = false;    // Light on - true, off - false
+int mode_of_lights = 0; // 0 - Normal, 1 - Gaming, 2 - Study
+
+//    ____          _        _     _             ____                             _   _   _
+//   / ___|___   __| | ___  | |   (_) ___  ___  | __ )  ___ _   _  ___  _ __   __| | | | | | ___ _ __ ___
+//  | |   / _ \ / _` |/ _ \ | |   | |/ _ \/ __| |  _ \ / _ \ | | |/ _ \| '_ \ / _` | | |_| |/ _ \ '__/ _ \  
+//  | |__| (_) | (_| |  __/ | |___| |  __/\__ \ | |_) |  __/ |_| | (_) | | | | (_| | |  _  |  __/ | |  __/_
+//   \____\___/ \__,_|\___| |_____|_|\___||___/ |____/ \___|\__, |\___/|_| |_|\__,_| |_| |_|\___|_|  \___( )
+//                                                          |___/                                        |/
+//   ____              _ _          _
+//  |  _ \  ___  _ __ ( ) |_    ___| |__   __ _ _ __   __ _  ___
+//  | | | |/ _ \| '_ \|/| __|  / __| '_ \ / _` | '_ \ / _` |/ _ \
+//  | |_| | (_) | | | | | |_  | (__| | | | (_| | | | | (_| |  __/
+//  |____/ \___/|_| |_|  \__|  \___|_| |_|\__,_|_| |_|\__, |\___|
+//                                                    |___/
+//               _                                     _                                   _           _     _              _       _
+//   _   _ _ __ | | ___  ___ ___   _   _  ___  _   _  | | ___ __   _____      __ __      _| |__   __ _| |_  | |_ ___     __| | ___ | |
+//  | | | | '_ \| |/ _ \/ __/ __| | | | |/ _ \| | | | | |/ / '_ \ / _ \ \ /\ / / \ \ /\ / / '_ \ / _` | __| | __/ _ \   / _` |/ _ \| |
+//  | |_| | | | | |  __/\__ \__ \ | |_| | (_) | |_| | |   <| | | | (_) \ V  V /   \ V  V /| | | | (_| | |_  | || (_) | | (_| | (_) |_|
+//   \__,_|_| |_|_|\___||___/___/  \__, |\___/ \__,_| |_|\_\_| |_|\___/ \_/\_/     \_/\_/ |_| |_|\__,_|\__|  \__\___/   \__,_|\___/(_)
+//                                 |___/
+
+//  Declarations - Display
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -58,22 +121,7 @@
 
 //  Declareations - API / Wifi
 
-const char *ssid = "SSID";
-const char *password = "Pass";
-
-String openWeatherMapApiKey = "API_KEY";
-
-String city = "Your_city";
-String countryCode = "LK"; // Your Contry Code
-
-char clientId[] = "CLIENT_ID";      // Your client ID of your spotify APP
-char clientSecret[] = "CLIENT_SID"; // Your client Secret of your spotify APP (Do Not share this!)
-
 String pre_track = "";
-
-#define SPOTIFY_MARKET "LK"
-
-#define SPOTIFY_REFRESH_TOKEN "REFRESH_TOKEN"
 
 WiFiClientSecure client;
 ESP8266WebServer server(80);
@@ -256,31 +304,6 @@ String unix_time_to_date_converted(long int seconds)
 bool is_night;
 bool is_night_func_goon = true;
 
-int alarm1[2] = {4, 15};          //  Alarm {hour, minute}
-bool alarm1_on = true;            //  Alarm Easy Toggle
-String alarm1_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
-int alarm1_duration = 5;          //  Alarm Duration in Minutes
-
-int alarm2[2] = {4, 30};          //  Alarm {hour, minute}
-bool alarm2_on = true;            //  Alarm Easy Toggle
-String alarm2_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
-int alarm2_duration = 10;         //  Alarm Duration in Minutes
-
-int alarm3[2] = {4, 45};          //  Alarm {hour, minute}
-bool alarm3_on = true;            //  Alarm Easy Toggle
-String alarm3_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
-int alarm3_duration = 10;         //  Alarm Duration in Minutes
-
-int alarm4[2] = {5, 0};           //  Alarm {hour, minute}
-bool alarm4_on = true;            //  Alarm Easy Toggle
-String alarm4_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
-int alarm4_duration = 10;         //  Alarm Duration in Minutes
-
-int alarm5[2] = {5, 15};          //  Alarm {hour, minute}
-bool alarm5_on = true;            //  Alarm Easy Toggle
-String alarm5_des = "Wake Up..."; //  Alarm Description - Max 21 Characters
-int alarm5_duration = 10;         //  Alarm Duration in Minutes
-
 long api_timer_delay = 180000;
 long api_last_time = 0;
 
@@ -327,11 +350,6 @@ long duration_of_track;
 
 int status;
 bool playing;
-
-//  Variables - Web Server
-
-bool lights = true;
-int mode_of_lights = 0;
 
 //  Bitmaps
 
@@ -1838,7 +1856,7 @@ void setup()
   else if (WiFi.status() == WL_CONNECTED)
   {
     timeClient.begin();
-    timeClient.setTimeOffset(19800); // Change according to Time Zone (GMT 0 = 0, GMT +1 = 3600, GMT +2 = 7200, GMT -1 = -3600 likewise)
+    timeClient.setTimeOffset(time_offset);
 
     update_rtc();
   }
@@ -1860,6 +1878,7 @@ void setup()
 
   display.setFont(&FreeSans18pt7b);
   get_data();
+  s.write('9');
 }
 
 // Web Server Functions

@@ -1,7 +1,7 @@
 #include <FastLED.h>
 #include <SoftwareSerial.h>
 
-#define NUM_LEDS 119
+#define NUM_LEDS 100
 
 CRGB leds[NUM_LEDS];
 SoftwareSerial s(5, 6); // RX, TX
@@ -18,68 +18,81 @@ char pre_value = '0';
 
 //  Basic
 
-DEFINE_GRADIENT_PALETTE(Black_gp){
-    0, 0, 0, 0,
-    255, 0, 0, 0};
+DEFINE_GRADIENT_PALETTE(Black_gp) {
+  0, 0, 0, 0,
+  255, 0, 0, 0
+};
 
 // Gaming
 
 DECLARE_GRADIENT_PALETTE(Rainbow_gp);
 
-DEFINE_GRADIENT_PALETTE(King_Yna_gp){
-    0, 26, 42, 108,
-    128, 178, 31, 31,
-    255, 253, 187, 45};
+DEFINE_GRADIENT_PALETTE(King_Yna_gp) {
+  0, 26, 42, 108,
+  128, 178, 31, 31,
+  255, 253, 187, 45
+};
 
-DEFINE_GRADIENT_PALETTE(Celestial_gp){
-    0, 195, 55, 100,
-    255, 29, 38, 113};
+DEFINE_GRADIENT_PALETTE(Celestial_gp) {
+  0, 195, 55, 100,
+  255, 29, 38, 113
+};
 
-DEFINE_GRADIENT_PALETTE(Influenza_gp){
-    0, 192, 72, 72,
-    255, 72, 0, 72};
+DEFINE_GRADIENT_PALETTE(Influenza_gp) {
+  0, 192, 72, 72,
+  255, 72, 0, 72
+};
 
 //  Music
 
-DEFINE_GRADIENT_PALETTE(Terminal_gp){
-    0, 15, 155, 15,
-    255, 0, 0, 0};
+DEFINE_GRADIENT_PALETTE(Terminal_gp) {
+  0, 15, 155, 15,
+  255, 0, 0, 0
+};
 
-DEFINE_GRADIENT_PALETTE(Meridian_gp){
-    0, 40, 60, 134,
-    255, 69, 162, 71};
+DEFINE_GRADIENT_PALETTE(Meridian_gp) {
+  0, 40, 60, 134,
+  255, 69, 162, 71
+};
 
-DEFINE_GRADIENT_PALETTE(Purpink_gp){
-    0, 127, 0, 255,
-    255, 255, 0, 255};
+DEFINE_GRADIENT_PALETTE(Purpink_gp) {
+  0, 127, 0, 255,
+  255, 255, 0, 255
+};
 
-DEFINE_GRADIENT_PALETTE(Calm_Darya_gp){
-    0, 95, 44, 130,
-    255, 73, 160, 157};
+DEFINE_GRADIENT_PALETTE(Calm_Darya_gp) {
+  0, 95, 44, 130,
+  255, 73, 160, 157
+};
 
 //  Study
 
-DEFINE_GRADIENT_PALETTE(Sunny_Days_gp){
-    0, 237, 229, 116,
-    255, 255, 245, 196};
+DEFINE_GRADIENT_PALETTE(Sunny_Days_gp) {
+  0, 237, 229, 116,
+  255, 255, 245, 196
+};
 
-DEFINE_GRADIENT_PALETTE(Margo_gp){
-    0, 255, 239, 186,
-    255, 255, 255, 255};
+DEFINE_GRADIENT_PALETTE(Margo_gp) {
+  0, 255, 239, 186,
+  255, 255, 255, 255
+};
 
-DEFINE_GRADIENT_PALETTE(Sky_gp){
-    0, 7, 101, 133,
-    255, 255, 255, 255};
+DEFINE_GRADIENT_PALETTE(Sky_gp) {
+  0, 7, 101, 133,
+  255, 255, 255, 255
+};
 
-DEFINE_GRADIENT_PALETTE(Windy_gp){
-    0, 172, 182, 229,
-    255, 134, 253, 232};
+DEFINE_GRADIENT_PALETTE(Windy_gp) {
+  0, 172, 182, 229,
+  255, 134, 253, 232
+};
 
 //  Alarm
 
-DEFINE_GRADIENT_PALETTE(Witching_Hour_gp){
-    0, 195, 20, 50,
-    255, 36, 11, 54};
+DEFINE_GRADIENT_PALETTE(Witching_Hour_gp) {
+  0, 195, 20, 50,
+  255, 36, 11, 54
+};
 
 CRGBPalette16 currentPalette(Black_gp);
 CRGBPalette16 targetPalette(Rainbow_gp);
@@ -147,17 +160,17 @@ void gaming_lights()
 
   switch (whichPalette)
   {
-  case 0:
-    targetPalette = Rainbow_gp;
-    break;
-  case 1:
-    targetPalette = King_Yna_gp;
-    break;
-  case 2:
-    targetPalette = Celestial_gp;
-    break;
-  case 3:
-    targetPalette = Influenza_gp;
+    case 0:
+      targetPalette = Rainbow_gp;
+      break;
+    case 1:
+      targetPalette = King_Yna_gp;
+      break;
+    case 2:
+      targetPalette = Celestial_gp;
+      break;
+    case 3:
+      targetPalette = Influenza_gp;
   }
 
   EVERY_N_SECONDS(10)
@@ -185,17 +198,17 @@ void music_lights()
 
   switch (whichPalette)
   {
-  case 0:
-    targetPalette = Terminal_gp;
-    break;
-  case 1:
-    targetPalette = Meridian_gp;
-    break;
-  case 2:
-    targetPalette = Purpink_gp;
-    break;
-  case 3:
-    targetPalette = Calm_Darya_gp;
+    case 0:
+      targetPalette = Terminal_gp;
+      break;
+    case 1:
+      targetPalette = Meridian_gp;
+      break;
+    case 2:
+      targetPalette = Purpink_gp;
+      break;
+    case 3:
+      targetPalette = Calm_Darya_gp;
   }
 
   EVERY_N_SECONDS(10)
@@ -222,17 +235,17 @@ void study_lights()
 
   switch (whichPalette)
   {
-  case 0:
-    targetPalette = Sunny_Days_gp;
-    break;
-  case 1:
-    targetPalette = Margo_gp;
-    break;
-  case 2:
-    targetPalette = Sky_gp;
-    break;
-  case 3:
-    targetPalette = Windy_gp;
+    case 0:
+      targetPalette = Sunny_Days_gp;
+      break;
+    case 1:
+      targetPalette = Margo_gp;
+      break;
+    case 2:
+      targetPalette = Sky_gp;
+      break;
+    case 3:
+      targetPalette = Windy_gp;
   }
 
   EVERY_N_SECONDS(10)
@@ -280,10 +293,15 @@ void loop()
   if (s.available())
   {
     char v = s.read();
-    if (v != pre_value)
+    String possible = "123456789";
+
+    if (v != pre_value && possible.indexOf(v) != -1)
     {
       value = v;
-      Serial.println(value);
+      pre_value = value;
+      Serial.print(value);
+      Serial.print("        ");
+      Serial.println(possible.indexOf(v));
     }
   }
 
