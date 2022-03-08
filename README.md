@@ -13,6 +13,7 @@ A Little Robot With Lot's of Potential...
 - Sync to Spotify Music and Play / Pause
 - Control Basic LED Strip Patterns from The Web Server
 - Automatic Time Setting on Startup
+- Easy Access to Web server via https://deskbot.netlify.app/
 
 <hr />
 
